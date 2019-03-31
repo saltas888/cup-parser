@@ -6,7 +6,7 @@ compile:
 	javac -cp ../java-cup-11b-runtime.jar *.java
 
 execute:
-	java -cp ../java-cup-11b-runtime.jar:. Main
+	java -cp ../java-cup-11b-runtime.jar:. Main < input.txt
 
 clean:
-	rm -f *.class *~
+	rm -f *.class *~ Scanner.java sym.java Parser.java
