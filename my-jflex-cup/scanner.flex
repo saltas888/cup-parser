@@ -70,22 +70,20 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 /* keywords */
 "if"              { return symbol(sym.IF); }
 "else"            { return symbol(sym.ELSE); }
+"prefix"          { return symbol(sym.PREFIX); }
+"suffix"          { return symbol(sym.SUFFIX); }
 
 /* names */
 {Identifier}           { return symbol(sym.ID, yytext()); }
 
 /* separators */
-\"              { string.setLength(0); yybegin(STRING); }
-";"               { return symbol(sym.SEMI); }
+  \"                { string.setLength(0); yybegin(STRING); }
 ","               { return symbol(sym.COMMA); }
 "("               { return symbol(sym.LPAR); }
 ")"               { return symbol(sym.RPAR); }
 "{"               { return symbol(sym.BEGIN); }
 "}"               { return symbol(sym.END); }
-"="               { return symbol(sym.ASSIGN); }
 "+"               { return symbol(sym.PLUS); }
-"prefix"          { return symbol(sym.PREFIX); }
-"suffix"          { return symbol(sym.SUFFIX); }
 
 {WhiteSpace} { /* just skip what was found, do nothing */ }
 
