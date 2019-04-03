@@ -17,7 +17,7 @@ parser code {:
 scan with {: return s.next_token(); :};
 
 
-terminal         SEMI, COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, PLUS;
+terminal         SUFFIX, PREFIX, COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, PLUS;
 terminal String  ID, STRING_LITERAL;
 
 non terminal         program;
@@ -28,38 +28,43 @@ non terminal         stmt;
 non terminal         identlist;
 non terminal         identlist2;
 non terminal         ident;
-non terminal         progexprlist;
-non terminal         progexpr;
+non terminal         calllist;
+non terminal         call;
 non terminal         expr;
 non terminal         cond;
 
 precedence left ELSE;
 
-program   ::=  funcdecllist:d progexprlistt:s                   {: RESULT = String.format(
+program   ::=  funcdecllist:d calllist:s                    {: RESULT = String.format(
                                                                     "public class Main { \n public static void main(String[] args) {\n %s }\n %s",
                                                                     s, d); 
                                                                 :}
     ;
-funcdecllist  ::=  funcdecl:d funcdecllist:dl                   {: String.format("%s\n%s", d, dl); :}
+calllist ::= call:c calllist:cl                                 {: RESULT = String.format("%s\n%s", c, cl); :}
+    | /* empty progexprlistt */                                 {: RESULT = ""; :}
+    ;
+call ::= expr:e                                                 {: RESULT = String.format("System.out.println(%s)\n", e); :}
+    ;
+funcdecllist ::= funcdecl:d funcdecllist:dl                     {: String.format("%s\n%s", d, dl); :}
     | /* empty funcdecllist */                                  {: RESULT = ""; :}
+    ;
+funcdecl ::= ID:i LPAR identlist:il RPAR BEGIN stmtlist:sl END  {: RESULT = String.format("public static String %s(%s){return %s}",i, il, sl); :}
     ;
 stmtlist  ::= stmt:s stmtlist:sl                                {: String.format("%s\n%s", s, sl); :}
     | /* empty stmtlist */                                      {: RESULT = ""; :}
     ;
-funcdecl ::= ID:i LPAR identlist:il RPAR BEGIN stmtlist:sl END  {: RESULT = String.format("public static String %s(%s){return %s}",i, il, sl); :}
+stmt ::= IF LPAR cond:c RPAR stmt:t ELSE stmt:e                 {: RESULT = String.format("%s ? %s : %s", c, t, e); :}
+    | expr:e                                                    {: RESULT = e; :}
     ;
 identlist ::= ident:i identlist2:il2                            {: RESULT = String.format("%s%s", i, il2); :}
+    | /* empty identlist */
     ;
-identlist2 ::= COMMA identlist:il                               {: RESULT = String.format(",%s",il); :}
+identlist2 ::= COMMA identlist2:il                              {: RESULT = String.format(",%s",il); :}
     | ident:i                                                   {: RESULT = i; :}
-    | /* empty identlist */                                     {: RESULT = ""; :}
+    |/* empty identlist2 */                                                 
     ;
 ident ::= ID:i                                                  {: RESULT = String.format("%s",i); :}
     ;                                                  
-stmt ::= stmtlist:sl                                            {: RESULT = sl; :}
-    | IF LPAR cond:c RPAR stmt:t ELSE stmt:e                    {: RESULT = String.format("%s ? %s : %s", c, t, e); :}
-    | expr:e                                                    {: RESULT = e; :}
-    ;
 cond ::= LPAR cond:c RPAR                                       {: RESULT = String.format("(c)", c); :}
     | expr:e1 SUFFIX:op expr:e2                                 {: RESULT = String.format("%s.endsWith(%s)", e2, e1); :}
     | expr:e1 PREFIX:op expr:e2                                 {: RESULT = String.format("%s.startsWith(%s)", e2, e1); :}
@@ -68,9 +73,4 @@ expr ::= ID:i                                                   {: RESULT = Stri
     | STRING_LITERAL:c                                          {: RESULT = String.format("\"%s\"", c); :}
     | expr:e1 PLUS expr:e2                                      {: RESULT = String.format("%s.concat(%s)}", e1, e2); :}
     | ID:i LPAR identlist:il RPAR                               {: RESULT = String.format("%s(%s)}", i, il); :}
-    ;
-progexpr ::= expr:e                                             {: RESULT = String.format("System.out.println(%s)\n", e); :}
-    ;
-progexprlistt ::= progexpr:e progexprlistt:pel                  {: RESULT = String.format("%s\n%s", e, pel); :}
-    | /* empty progexprlistt */                                 {: RESULT = ""; :}
     ;
