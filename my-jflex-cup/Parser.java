@@ -216,7 +216,7 @@ class CUP$Parser$actions {
 		int dlleft = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).left;
 		int dlright = ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()).right;
 		Object dl = (Object)((java_cup.runtime.Symbol) CUP$Parser$stack.peek()).value;
-		 String.format("%s\n%s", d, dl); 
+		 RESULT = String.format("%s\n%s", d, dl); 
               CUP$Parser$result = parser.getSymbolFactory().newSymbol("funcdeclcalllist",1, ((java_cup.runtime.Symbol)CUP$Parser$stack.elementAt(CUP$Parser$top-1)), ((java_cup.runtime.Symbol)CUP$Parser$stack.peek()), RESULT);
             }
           return CUP$Parser$result;

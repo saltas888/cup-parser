@@ -45,7 +45,7 @@ program   ::=  funcdeclcalllist:d                               {: System.out.pr
                                                                     ); 
                                                                 :}
         ;
-funcdeclcalllist ::= funcdeclcall:d funcdeclcalllist:dl         {: String.format("%s\n%s", d, dl); :}
+funcdeclcalllist ::= funcdeclcall:d funcdeclcalllist:dl         {: RESULT = String.format("%s\n%s", d, dl); :}
     | /* empty funcdecllist */                                  {: RESULT = ""; :}  
     ;
 funcdeclcall ::= ID:i LPAR identlist:il RPAR funcdeclcall_:e    {: RESULT = String.format("public static String %s(%s){return %s}\n",i, il, e); :}
@@ -73,6 +73,6 @@ expr ::= expr_fn:ti                                             {: RESULT = Stri
     | IF LPAR cond:c RPAR expr:t ELSE expr:e                    {: RESULT = String.format("%s ? %s : %s", c, t, e); :}
     | ID:i                                                      {: RESULT = String.format("%s", i); :}
     ;
-expr_fn ::= ID:i LPAR identlist:il RPAR                              {: RESULT = String.format("%s(%s)}",i, il); :}
+expr_fn ::= ID:i LPAR identlist:il RPAR                         {: RESULT = String.format("%s(%s)}",i, il); :}
     ;
 
