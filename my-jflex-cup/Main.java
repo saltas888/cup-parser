@@ -3,7 +3,8 @@ import java.io.*;
 
 class Main {
     public static void main(String[] argv) throws Exception{
+        System.out.println("Please type your arithmethic expression:");
         Parser p = new Parser(new Scanner(new InputStreamReader(System.in)));
-        p.parse();
+        p.debug_parse();
     }
 }

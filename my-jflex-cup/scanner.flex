@@ -21,7 +21,6 @@ import java_cup.runtime.*;
    generated parser.
 */
 %cup
-%unicode
 
 /*
   Declarations
@@ -57,7 +56,7 @@ import java_cup.runtime.*;
    one and nine followed by zero or more numbers between zero and nine
    or just a zero.  */
 
-Identifier = [a-zA-Z$_] [a-zA-Z0-9$_]*
+Identifier = [a-zA-Z]+
 LineTerminator = \r|\n|\r\n;
 WhiteSpace = {LineTerminator} | [ \t\f]
 
@@ -67,31 +66,30 @@ WhiteSpace = {LineTerminator} | [ \t\f]
 /* ------------------------Lexical Rules Section---------------------- */
 
 <YYINITIAL>{
-/* keywords */
-"if"              { return symbol(sym.IF); }
-"else"            { return symbol(sym.ELSE); }
-"prefix"          { return symbol(sym.PREFIX); }
-"suffix"          { return symbol(sym.SUFFIX); }
-
-/* names */
-{Identifier}           { return symbol(sym.ID, yytext()); }
-
-/* separators */
   \"                { string.setLength(0); yybegin(STRING); }
-","               { return symbol(sym.COMMA); }
-"("               { return symbol(sym.LPAR); }
-")"               { return symbol(sym.RPAR); }
-"{"               { return symbol(sym.BEGIN); }
-"}"               { return symbol(sym.END); }
-"+"               { return symbol(sym.PLUS); }
+  /* keywords */
+  "if"              { return symbol(sym.IF); }
+  "else"            { return symbol(sym.ELSE); }
+  "prefix"          { return symbol(sym.PREFIX); }
+  "suffix"          { return symbol(sym.SUFFIX); }
 
-{WhiteSpace} { /* just skip what was found, do nothing */ }
+  /* separators */
+  ","               { return symbol(sym.COMMA); }
+  "("               { return symbol(sym.LPAR); }
+  ")"               { return symbol(sym.RPAR); }
+  "{"               { return symbol(sym.BEGIN); }
+  "}"               { return symbol(sym.END); }
+  "+"               { return symbol(sym.PLUS); }
+
+  /* names */
+  {Identifier}      { return symbol(sym.ID, yytext()); }
+  {WhiteSpace} { /* just skip what was found, do nothing */ }
 
 }
 
 <STRING> {
   \"                             { yybegin(YYINITIAL);
-                                       return symbol(sym.STRING_LITERAL, string.toString()); }
+                                   return symbol(sym.STRING_LITERAL, string.toString()); }
   [^\n\r\"\\]+                   { string.append( yytext() ); }
   \\t                            { string.append('\t'); }
   \\n                            { string.append('\n'); }

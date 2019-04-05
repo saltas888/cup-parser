@@ -21,63 +21,58 @@ terminal         SUFFIX, PREFIX, COMMA, LPAR, RPAR, BEGIN, END, IF, ELSE, PLUS;
 terminal String  ID, STRING_LITERAL;
 
 non terminal         program;
-non terminal         funcdecllist;
-non terminal         funcdecl;
+non terminal         funcdeclcalllist;
+non terminal         funcdeclcall_;
+non terminal         funcdeclcall;
 non terminal         identlist;
 non terminal         identlist2;
 non terminal         calllist;
 non terminal         call;
 non terminal         exprlist;
+non terminal         initial;
 non terminal         expr;
-non terminal         expr1;
-non terminal         term;
-non terminal         termid;
-non terminal         termid2;
+non terminal         expr_;
+non terminal         expr_id;
+non terminal         expr_fn;
 non terminal         cond;
 
 precedence left  LPAR, RPAR, BEGIN, END, ELSE;
 
-program   ::=  funcdecllist:d calllist:s                        {: System.out.println(
+program   ::=  funcdeclcalllist:d                               {: System.out.println(
                                                                     String.format(
-                                                                        "public class Main { \n public static void main(String[] args) {\n %s }\n %s",
-                                                                        s, d)
+                                                                        "public class Main { \n public static void main(String[] args) {\n %s }\n",
+                                                                        s)
                                                                     ); 
                                                                 :}
-    ;
-calllist ::= call:c calllist:cl                                 {: RESULT = String.format("%s\n%s", c, cl); :}
-    | /* empty progexprlistt */                                 {: RESULT = ""; :}
-    ;
-call ::= expr:e                                                 {: RESULT = String.format("System.out.println(%s)\n", e); :}
-    ;
-funcdecllist ::= funcdecl:d funcdecllist:dl                     {: String.format("%s\n%s", d, dl); :}
+        ;
+funcdeclcalllist ::= funcdeclcall:d funcdeclcalllist:dl         {: String.format("%s\n%s", d, dl); :}
     | /* empty funcdecllist */                                  {: RESULT = ""; :}  
     ;
-funcdecl ::= ID:i LPAR identlist:il RPAR BEGIN exprlist:el END  {: RESULT = String.format("public static String %s(%s){return %s}\n",i, il, el); :}
+funcdeclcall ::= ID:i LPAR identlist:il RPAR funcdeclcall_:e    {: RESULT = String.format("public static String %s(%s){return %s}\n",i, il, e); :}
     ;
-identlist ::= ID:i identlist2:il2                               {: RESULT = String.format("%s%s", i, il2); :}
+funcdeclcall_ ::= BEGIN exprlist:el END                         {: RESULT = String.format("public static String %s(){return}\n", el); :}
+    | /* empty funcdecllist */                                  {: RESULT = ""; :}  
+    ;
+identlist ::= expr:i identlist2:il2                             {: RESULT = String.format("%s%s", i, il2); :}
     | /* empty identlist */                                     {: RESULT = ""; :}                                                       
     ;
 identlist2 ::= COMMA identlist2:il                              {: RESULT = String.format(",%s",il); :}
     |/* empty identlist2 */                                     {: RESULT = ""; :}                                                                                                        
     ;
-cond ::= LPAR cond:c RPAR                                       {: RESULT = String.format("(c)", c); :}
-    | expr:e1 SUFFIX:op expr:e2                                 {: RESULT = String.format("%s.endsWith(%s)", e2, e1); :}
-    | expr:e1 PREFIX:op expr:e2                                 {: RESULT = String.format("%s.startsWith(%s)", e2, e1); :}
+cond ::= LPAR cond:c RPAR                                       {: RESULT = String.format("(%s)", c); :}
+    | exprlist:e1 SUFFIX:op exprlist:e2                         {: RESULT = String.format("%s.endsWith(%s)", e2, e1); :}
+    | exprlist:e1 PREFIX:op exprlist:e2                         {: RESULT = String.format("%s.startsWith(%s)", e2, e1); :}
     ;
 exprlist ::= expr:e exprlist:el                                 {: String.format("%s\n%s", s, el); :}
     | /* empty exprlist */                                      {: RESULT = ""; :}                                                       
     ;
-// expr ::= term:t expr1:e1                                        {: RESULT = String.format("%s\n%s}", t, e1); :}
+// expr ::= expr_:t                                                {: RESULT = String.format("%s\n}", t); :}
 //     ;
-        // | PLUS term:t expr1:e1                                  {: RESULT = String.format("%s.concat(%s)}", t, e1); :}
-expr ::= termid:i                                               {: RESULT = String.format("%s",i); :}
-    // | expr:e1 PLUS expr:e2                                      {: RESULT = String.format("%s.concat(%s)}", e1, e2); :}
+expr ::= expr_fn:ti                                             {: RESULT = String.format("%s", ti); :}
     | STRING_LITERAL:c                                          {: RESULT = String.format("\"%s\"", c); :}
     | IF LPAR cond:c RPAR expr:t ELSE expr:e                    {: RESULT = String.format("%s ? %s : %s", c, t, e); :}
+    | ID:i                                                      {: RESULT = String.format("%s", i); :}
     ;
-termid ::= ID:i termid2:ti                                      {: RESULT = String.format("%s%s", i, ti); :}
-    ;
-termid2 ::= LPAR identlist:il RPAR                              {: RESULT = String.format("(%s)}", il); :}
-    | /* empty ttermid */                                       {: RESULT = ""; :}  
+expr_fn ::= ID:i LPAR identlist:il RPAR                              {: RESULT = String.format("%s(%s)}",i, il); :}
     ;
 
