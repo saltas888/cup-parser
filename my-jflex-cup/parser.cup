@@ -40,17 +40,30 @@ precedence left  LPAR, RPAR, BEGIN, END, ELSE;
 
 program   ::=  funcdeclcalllist:d                               {: System.out.println(
                                                                     String.format(
-                                                                        "public class Main { \n public static void main(String[] args) {\n %s }\n}",
+                                                                        "public class Main {\n %s \n }",
                                                                         d)
                                                                     ); 
                                                                 :}
         ;
-funcdeclcalllist ::= funcdeclcall:d funcdeclcalllist:dl         {: RESULT = String.format("%s\n%s", d, dl); :}
+//public static void main(String[] args) {\n %s }
+funcdeclcalllist ::= calllist:cl                                {: RESULT = String.format("public static void main(String[] args) {\n %s }", cl); :}
+    | funcdeclcall:dl                                           {: RESULT = String.format("%s", dl); :}
     | /* empty funcdecllist */                                  {: RESULT = ""; :}  
     ;
-funcdeclcall ::= expr_fn:e1                                     {: RESULT = String.format("System.out.println(%s)", e1); :}
-    | expr_fn:e1 BEGIN exprlist:el END                          {: RESULT = String.format("public static String %s \n {\nreturn %s\n}",e1, el); :}
+funcdeclcall ::= expr_fn:e1 BEGIN exprlist:el END funcdeclcalllist:dl      {: RESULT = String.format("public static String %s \n {\nreturn %s\n}\n%s",e1, el, dl); :}
     ;
+calllist::= expr_fn:e1 funcdeclcalllist:cl                       {: RESULT = String.format("System.out.println(%s)\n%s", e1, cl); :}
+    ;
+// funcdeclcall ::= expr_fn:e1                                     {: RESULT = String.format("System.out.println(%s)", e1); :}
+//     | expr_fn:e1 BEGIN exprlist:el END                          {: RESULT = String.format("public static String %s \n {\nreturn %s\n}",e1, el); :}
+//     ;
+
+// funcdeclcalllist ::= funcdeclcall:d funcdeclcalllist:dl         {: RESULT = String.format("%s\n%s", d, dl); :}
+//     | /* empty funcdecllist */                                  {: RESULT = ""; :}  
+//     ;
+// funcdeclcall ::= expr_fn:e1                                     {: RESULT = String.format("System.out.println(%s)", e1); :}
+//     | expr_fn:e1 BEGIN exprlist:el END                          {: RESULT = String.format("public static String %s \n {\nreturn %s\n}",e1, el); :}
+//     ;
 // funcdeclcall_ ::= BEGIN exprlist:el END                         {: RESULT = String.format("{\nreturn %s\n}\n", el); :}
 //     | /* empty funcdecllist */                                  {: RESULT = ""; :}  
 //     ;
