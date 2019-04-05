@@ -56,7 +56,7 @@ import java_cup.runtime.*;
    one and nine followed by zero or more numbers between zero and nine
    or just a zero.  */
 
-Identifier = [a-zA-Z]+
+Identifier = [a-zA-Z0-9_]+
 LineTerminator = \r|\n|\r\n;
 WhiteSpace = {LineTerminator} | [ \t\f]
 

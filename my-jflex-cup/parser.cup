@@ -70,14 +70,15 @@ calllist::= expr_fn:e1 funcdeclcalllist:cl                       {: RESULT = Str
 identlist ::= expr:i identlist2:il2                             {: RESULT = String.format("%s%s", i, il2); :}
     | /* empty identlist */                                     {: RESULT = ""; :}                                                       
     ;
-identlist2 ::= COMMA identlist2:il                              {: RESULT = String.format(",%s",il); :}
+identlist2 ::= COMMA expr:e identlist2:il                       {: RESULT = String.format(",%s%s", e, il); :}
     |/* empty identlist2 */                                     {: RESULT = ""; :}                                                                                                        
     ;
 cond ::= LPAR cond:c RPAR                                       {: RESULT = String.format("(%s)", c); :}
     | exprlist:e1 SUFFIX:op exprlist:e2                         {: RESULT = String.format("%s.endsWith(%s)", e2, e1); :}
     | exprlist:e1 PREFIX:op exprlist:e2                         {: RESULT = String.format("%s.startsWith(%s)", e2, e1); :}
     ;
-exprlist ::= expr:e exprlist:el                                 {: RESULT = String.format("%s\n%s", e, el); :}
+exprlist ::= expr:e exprlist:el                                 {: RESULT = String.format("%s%s", e, el); :}
+    | expr:e PLUS exprlist:el                                   {: RESULT = String.format("%s.concat(%s)", e, el); :}
     | /* empty exprlist */                                      {: RESULT = ""; :}                                                       
     ;
 // expr ::= expr_:t                                                {: RESULT = String.format("%s\n}", t); :}
