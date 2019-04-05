@@ -5,9 +5,11 @@ is-prefix-of (string1 prefix string2): Whether string1 is a prefix of string2.
 is-suffix-of (string1 suffix string2): Whether string1 is a suffix of string2.
 All values in the language are strings.
 ## Execution instructions:
-
+```
+$ cd parser
 $ make compile
 $ make execute < input.txt
+```
 ## Examples
 ### #1
 *Input:*
